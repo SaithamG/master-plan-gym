@@ -1,0 +1,868 @@
+﻿<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Master Plan Muscu & Volley</title>
+  <style>
+    :root {
+      --bg: #0d1117;
+      --card-bg: #161b22;
+      --border: #30363d;
+      --primary: #38bdf8;
+      --primary-dim: rgba(56, 189, 248, 0.15);
+      --accent: #f59e0b;
+      --accent-dim: rgba(245, 158, 11, 0.15);
+      --text: #f0f6fc;
+      --text-muted: #8b949e;
+      --green: #22c55e;
+      --green-dim: rgba(34, 197, 94, 0.15);
+      --red: #ef4444;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; -webkit-tap-highlight-color: transparent; }
+    body { background-color: var(--bg); color: var(--text); padding-bottom: 75px; line-height: 1.4; }
+    
+    header { background: #161b22; border-bottom: 1px solid var(--border); padding: 14px 16px; position: sticky; top: 0; z-index: 100; display: flex; justify-content: space-between; align-items: center; }
+    header h1 { font-size: 1.05rem; font-weight: 700; color: var(--primary); display: flex; align-items: center; gap: 8px; }
+    .badge-creatine { font-size: 0.72rem; background: var(--primary-dim); color: var(--primary); padding: 4px 8px; border-radius: 999px; font-weight: 700; border: 1px solid rgba(56, 189, 248, 0.3); }
+
+    /* Nav Tabs */
+    .nav-tabs { display: flex; background: #161b22; border-bottom: 1px solid var(--border); overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch; padding: 6px 12px; gap: 6px; }
+    .nav-tabs::-webkit-scrollbar { display: none; }
+    .tab-btn { background: none; border: 1px solid transparent; color: var(--text-muted); font-size: 0.8rem; font-weight: 600; padding: 7px 11px; border-radius: 8px; white-space: nowrap; cursor: pointer; transition: all 0.2s; }
+    .tab-btn.active { background: var(--primary); color: #000; font-weight: 700; }
+
+    .content-section { display: none; padding: 14px 14px 20px; }
+    .content-section.active { display: block; animation: fadeIn 0.2s ease-in-out; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+
+    .alert-box { background: rgba(245, 158, 11, 0.12); border: 1px solid var(--accent); border-radius: 10px; padding: 10px 14px; margin-bottom: 14px; font-size: 0.82rem; color: #fde68a; }
+    .alert-box strong { color: var(--accent); }
+
+    .exercise-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 14px; margin-bottom: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+    .ex-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
+    .ex-title { font-size: 0.95rem; font-weight: 700; color: #fff; }
+    .ex-category { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700; color: var(--primary); margin-bottom: 2px; }
+    
+    .ex-load-badge { background: #21262d; border: 1px solid var(--border); border-radius: 6px; padding: 4px 8px; text-align: right; }
+    .ex-load-badge .weight { font-size: 0.95rem; font-weight: 800; color: var(--green); }
+    .ex-load-badge .sets { font-size: 0.68rem; color: var(--text-muted); }
+
+    .series-breakdown { background: #0d1117; border-radius: 8px; padding: 8px 12px; margin: 8px 0; border: 1px solid #21262d; }
+    .series-title { font-size: 0.72rem; text-transform: uppercase; font-weight: 700; color: var(--text-muted); margin-bottom: 4px; }
+    .series-grid { display: flex; gap: 8px; flex-wrap: wrap; }
+    .serie-pill { background: #161b22; border: 1px solid var(--border); border-radius: 6px; padding: 3px 8px; font-size: 0.78rem; font-weight: 600; color: #e6edf3; }
+    .serie-pill span { color: var(--green); font-weight: 700; }
+
+    /* Progressive overload ramp */
+    .overload-box { background: rgba(56, 189, 248, 0.08); border: 1px dashed rgba(56, 189, 248, 0.4); border-radius: 8px; padding: 8px 10px; margin-top: 8px; font-size: 0.78rem; }
+    .overload-box .otitle { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; color: var(--primary); margin-bottom: 4px; display: flex; justify-content: space-between; }
+    .ramp-steps { display: flex; justify-content: space-between; gap: 4px; margin-top: 4px; }
+    .ramp-step { flex: 1; background: #0d1117; border: 1px solid var(--border); border-radius: 4px; padding: 3px 2px; text-align: center; font-size: 0.7rem; }
+    .ramp-step .slabel { color: var(--text-muted); font-size: 0.65rem; }
+    .ramp-step .sval { font-weight: 700; color: #fff; margin-top: 1px; }
+    .ramp-step.current { border-color: var(--primary); background: var(--primary-dim); }
+    .ramp-step.current .sval { color: var(--primary); }
+    .ramp-step.target { border-color: var(--accent); background: var(--accent-dim); }
+    .ramp-step.target .sval { color: var(--accent); }
+
+    .superset-tag { display: inline-block; font-size: 0.68rem; background: rgba(239, 68, 68, 0.15); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.4); padding: 2px 6px; border-radius: 4px; font-weight: 700; margin-bottom: 6px; }
+
+    /* Calendar list */
+    .cal-item { background: var(--card-bg); border: 1px solid var(--border); border-radius: 10px; padding: 12px; margin-bottom: 10px; }
+    .cal-date { font-size: 0.78rem; font-weight: 700; color: var(--primary); text-transform: uppercase; margin-bottom: 4px; }
+    .cal-title { font-size: 0.92rem; font-weight: 700; color: #fff; margin-bottom: 4px; }
+    .cal-desc { font-size: 0.8rem; color: var(--text-muted); line-height: 1.4; }
+
+    .footer-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #161b22; border-top: 1px solid var(--border); padding: 8px 14px; text-align: center; font-size: 0.72rem; color: var(--text-muted); z-index: 100; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>âš¡ MASTER PLAN GYM</h1>
+    <span class="badge-creatine">Vendredi 16 Oct • 3-5g Créatine</span>
+  </header>
+
+  <nav class="nav-tabs">
+    <button class="tab-btn active" data-tab="lower1" onclick="showTab('lower1')" style="color: #38bdf8; border-color: rgba(56, 189, 248, 0.6); background: rgba(56, 189, 248, 0.2); font-weight: 800;">âš¡ LOWER 1 (AUJOURD'HUI)</button>
+    <button class="tab-btn" data-tab="warmup" onclick="showTab('warmup')" style="color: #f59e0b;">ðŸ”¥ Ã‰CHAUFFEMENT VOLLEY</button>
+    <button class="tab-btn" data-tab="upper1" onclick="showTab('upper1')">UPPER 1 (Jeu)</button>
+    <button class="tab-btn" data-tab="lower2" onclick="showTab('lower2')">LOWER 2 (Ven)</button>
+    <button class="tab-btn" data-tab="upper2" onclick="showTab('upper2')">UPPER 2 (Dim)</button>
+    <button class="tab-btn" data-tab="cal" onclick="showTab('cal')">CALENDRIER S1-S4</button>
+  </nav>
+
+  <!-- TAB: UPPER 2 -->
+  <section id="upper2" class="content-section">
+    <div class="alert-box">
+      <strong>SÃ©ance du Dimanche :</strong> 3 sÃ©ries effectives strictes partout. Penser au tempo contrÃ´lÃ© et au Pullover pour le mimÃ©tisme d'attaque volley.
+    </div>
+
+    <!-- Pecs 1 -->
+    <div class="exercise-card">
+      <div class="ex-header">
+        <div>
+          <div class="ex-category">Pecs 1 â€” Masse Convergente</div>
+          <div class="ex-title">Chest Press Convergent Machine</div>
+        </div>
+        <div class="ex-load-badge">
+          <div class="weight">25-30 kg</div>
+          <div class="sets">3 Ã— 8 reps / bras</div>
+        </div>
+      </div>
+      <div class="series-breakdown">
+        <div class="series-title">DÃ©tail des 3 sÃ©ries aujourd'hui :</div>
+        <div class="series-grid">
+          <div class="serie-pill">S1 : <span>25 kg</span> Ã— 8</div>
+          <div class="serie-pill">S2 : <span>27,5 kg</span> Ã— 8</div>
+          <div class="serie-pill">S3 : <span>30 kg</span> Ã— 8</div>
+        </div>
+      </div>
+      <div class="overload-box">
+        <div class="otitle"><span>Rampe de Surcharge Phase 1</span> <span>Cible : 32,5 kg</span></div>
+        <div class="ramp-steps">
+          <div class="ramp-step current"><div class="slabel">S1 (Auj)</div><div class="sval">30 kg</div></div>
+          <div class="ramp-step"><div class="slabel">S2</div><div class="sval">30 kg (3x8)</div></div>
+          <div class="ramp-step"><div class="slabel">S3</div><div class="sval">32,5 kg (test)</div></div>
+          <div class="ramp-step target"><div class="slabel">S4 (Tokyo)</div><div class="sval">32,5 kg (3x8)</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pecs 2 -->
+    <div class="exercise-card">
+      <div class="ex-header">
+        <div>
+          <div class="ex-category">Pecs 2 â€” Faisceau Claviculaire (Haut)</div>
+          <div class="ex-title">Ã‰cartÃ© Poulie Basse â†— Haut</div>
+        </div>
+        <div class="ex-load-badge">
+          <div class="weight">7-9 kg</div>
+          <div class="sets">3 Ã— 10-12 reps</div>
+        </div>
+      </div>
+      <div class="series-breakdown">
+        <div class="series-title">DÃ©tail des 3 sÃ©ries aujourd'hui :</div>
+        <div class="series-grid">
+          <div class="serie-pill">S1 : <span>7 kg</span> Ã— 12</div>
+          <div class="serie-pill">S2 : <span>8 kg</span> Ã— 10</div>
+          <div class="serie-pill">S3 : <span>9 kg</span> Ã— 10</div>
+        </div>
+      </div>
+      <div class="overload-box">
+        <div class="otitle"><span>Surcharge</span> <span>Focus Contraction</span></div>
+        <div style="font-size: 0.74rem; color: #c9d1d9;">Poulies tout en bas, montÃ©e vers les yeux. Squeeze 1 sec en haut. Palier cible : 9-10 kg propres.</div>
+      </div>
+    </div>
+
+    <!-- Dos 1 -->
+    <div class="exercise-card">
+      <div class="ex-header">
+        <div>
+          <div class="ex-category">Dos 1 â€” Ã‰paisseur</div>
+          <div class="ex-title">Rowing Assis Poulie Prise V</div>
+        </div>
+        <div class="ex-load-badge">
+          <div class="weight">45-52 kg</div>
+          <div class="sets">3 Ã— 8-10 reps</div>
+        </div>
+      </div>
+      <div class="series-breakdown">
+        <div class="series-title">DÃ©tail des 3 sÃ©ries aujourd'hui :</div>
+        <div class="series-grid">
+          <div class="serie-pill">S1 : <span>45 kg</span> Ã— 10</div>
+          <div class="serie-pill">S2 : <span>50 kg</span> Ã— 8</div>
+          <div class="serie-pill">S3 : <span>52 kg</span> Ã— 8</div>
+        </div>
+      </div>
+      <div class="overload-box">
+        <div class="otitle"><span>Rampe de Surcharge Phase 1</span> <span>Cible : 54 kg</span></div>
+        <div class="ramp-steps">
+          <div class="ramp-step current"><div class="slabel">S1 (Auj)</div><div class="sval">52 kg Ã— 8</div></div>
+          <div class="ramp-step"><div class="slabel">S2</div><div class="sval">52 kg Ã— 10</div></div>
+          <div class="ramp-step"><div class="slabel">S3</div><div class="sval">54 kg Ã— 8</div></div>
+          <div class="ramp-step target"><div class="slabel">S4 (Tokyo)</div><div class="sval">54 kg (3x8)</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dos 2 -->
+    <div class="exercise-card">
+      <div class="ex-header">
+        <div>
+          <div class="ex-category">Dos 2 â€” Largeur & Smash Volley</div>
+          <div class="ex-title">Pullover Poulie Haute Bras Tendus</div>
+        </div>
+        <div class="ex-load-badge">
+          <div class="weight">23-27 kg</div>
+          <div class="sets">3 Ã— 10-12 reps</div>
+        </div>
+      </div>
+      <div class="series-breakdown">
+        <div class="series-title">DÃ©tail des 3 sÃ©ries aujourd'hui :</div>
+        <div class="series-grid">
+          <div class="serie-pill">S1 : <span>23 kg</span> Ã— 12</div>
+          <div class="serie-pill">S2 : <span>25 kg</span> Ã— 10</div>
+          <div class="serie-pill">S3 : <span>27 kg</span> Ã— 10</div>
+        </div>
+      </div>
+      <div class="overload-box">
+        <div class="otitle"><span>Surcharge</span> <span>Grand Dorsal & Rabat</span></div>
+        <div style="font-size: 0.74rem; color: #c9d1d9;">Buste penchÃ©, bras quasi tendus, rabat vers les cuisses. 0 tension coude/poignet. Palier : 27-30 kg.</div>
+      </div>
+    </div>
+
+    <!-- Ã‰paules 1 -->
+    <div class="exercise-card">
+      <div class="ex-header">
+        <div>
+          <div class="ex-category">Ã‰paules 1 â€” PoussÃ©e Machine</div>
+          <div class="ex-title">DÃ©veloppÃ© Ã‰paules Assis Machine</div>
+        </div>
+        <div class="ex-load-badge">
+          <div class="weight">35-40 kg</div>
+          <div class="sets">3 Ã— 8 reps</div>
+        </div>
+      </div>
+      <div class="series-breakdown">
+        <div class="series-title">DÃ©tail des 3 sÃ©ries aujourd'hui :</div>
+        <div class="series-grid">
+          <div class="serie-pill">S1 : <span>35 kg</span> Ã— 8</div>
+          <div class="serie-pill">S2 : <span>35 kg</span> Ã— 8</div>
+          <div class="serie-pill">S3 : <span>40 kg</span> Ã— 6-8</div>
+        </div>
+      </div>
+      <div class="overload-box">
+        <div class="otitle"><span>Rampe de Surcharge</span> <span>Cible : 40 kg (3x8)</span></div>
+        <div class="ramp-steps">
+          <div class="ramp-step current"><div class="slabel">S1 (Auj)</div><div class="sval">40 kg Ã— 6-8</div></div>
+          <div class="ramp-step"><div class="slabel">S2</div><div class="sval">40 kg Ã— 8</div></div>
+          <div class="ramp-step"><div class="slabel">S3</div><div class="sval">40 kg (3x8)</div></div>
+          <div class="ramp-step target"><div class="slabel">S4 (Tokyo)</div><div class="sval">42,5 kg</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Ã‰paules 2 -->
+    <div class="exercise-card">
+      <div class="ex-header">
+        <div>
+          <div class="ex-category">Ã‰paules 2 â€” ArriÃ¨re / Posture</div>
+          <div class="ex-title">Oiseau Machine (Reverse Fly)</div>
+        </div>
+        <div class="ex-load-badge">
+          <div class="weight">45-50 kg</div>
+          <div class="sets">3 Ã— 8-10 reps</div>
+        </div>
+      </div>
+      <div class="series-breakdown">
+        <div class="series-title">DÃ©tail des 3 sÃ©ries aujourd'hui :</div>
+        <div class="series-grid">
+          <div class="serie-pill">S1 : <span>45 kg</span> Ã— 10</div>
+          <div class="serie-pill">S2 : <span>50 kg</span> Ã— 8</div>
+          <div class="serie-pill">S3 : <span>50 kg</span> Ã— 8</div>
+        </div>
+      </div>
+      <div class="overload-box">
+        <div class="otitle"><span>Surcharge</span> <span>Palier : 52 kg</span></div>
+        <div style="font-size: 0.74rem; color: #c9d1d9;">Ouvrir la cage sans hausser les trapÃ¨zes. Valider 50 kg x 10 avant 52 kg.</div>
+      </div>
+    </div>
+
+    <!-- Finisher Bras -->
+    <div class="exercise-card">
+      <span class="superset-tag">SUPERSET BRAS (3 TOURS)</span>
+      <div class="ex-title" style="margin-bottom: 6px;">Curl InclinÃ© + Skullcrusher Barre Front</div>
+      <div class="series-breakdown">
+        <div class="series-title">DÃ©tail des 3 tours aujourd'hui :</div>
+        <div class="series-grid">
+          <div class="serie-pill">Biceps : <span>10 kg</span> Ã— 8</div>
+          <div class="serie-pill">Triceps : <span>20 kg</span> Ã— 8</div>
+        </div>
+      </div>
+      <div class="overload-box">
+        <div class="otitle"><span>Surcharge Bras</span> <span>Cible : 12 kg & 22,5 kg</span></div>
+        <div style="font-size: 0.74rem; color: #c9d1d9;">DÃ¨s que les 3 x 8 passent propres : Biceps âž” 12 kg / Triceps âž” 22,5 kg.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TAB: LOWER 1 -->
+  <section id="lower1" class="content-section">
+    <div class="alert-box" style="background: rgba(34, 197, 94, 0.12); border-color: var(--green); color: #bbf7d0;">
+      <div style="font-size: 0.95rem; font-weight: 800; color: var(--green); margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center;">
+        <span>ðŸ† MARDI 13 OCTOBRE : RECORD VALIDÃ‰ !</span>
+        <span style="font-size: 0.72rem; background: var(--green-dim); color: var(--green); padding: 2px 8px; border-radius: 999px; border: 1px solid var(--green);">SiÃ¨ge Cran 7</span>
+      </div>
+      <p style="margin-bottom: 8px; color: #fff;"><strong>Presse pulvÃ©risÃ©e Ã  134 kg x 7</strong> (aprÃ¨s 127 kg x 8 et 2 x 8 Ã  130 kg). PoussÃ©e talons pieds hauts magistrale : quads et fessiers blindÃ©s, zÃ©ro douleur au genou ni au pied !</p>
+      <div style="background: rgba(0,0,0,0.35); border-radius: 8px; padding: 8px 10px; font-size: 0.78rem; line-height: 1.45; border-left: 3px solid var(--green);">
+        âœ… <strong>Bilan de la sÃ©ance du 13/10 :</strong><br>
+        â€¢ ðŸŸ¢ <strong>Presse Horizontale (Cran 7) :</strong> 127 kg x 8, 130 kg x 8, 130 kg x 8, <strong>134 kg x 7</strong> (Record !).<br>
+        â€¢ ðŸŸ¢ <strong>Step kinÃ© unilatÃ©ral :</strong> 1 x 8 PDC + <strong>3 x 8 Ã  16 kg</strong> (1Ã¨re fois validÃ© sur 3 sÃ©ries d'affilÃ©e).<br>
+        â€¢ ðŸŸ¢ <strong>Leg curl assis :</strong> 52 kg x 8, 52 kg x 8, <strong>54,3 kg x 8</strong>.<br>
+        â€¢ ðŸŸ¢ <strong>Bonus Ã‰paules :</strong> Ã‰lÃ©vations latÃ©rales haltÃ¨res 3 x 16-17 Ã  7 kg.<br>
+        â€¢ ðŸ›¡ï¸ <strong>Pied & Chaussures :</strong> 0 douleur en Nike Giannis. PliomÃ©trie prÃ©servÃ©e avec succÃ¨s avant le match du 15/10.
+      </div>
+    </div>
+
+    <!-- Exercice KinÃ© -->
+    <div class="exercise-card">
+      <div class="ex-header">
+        <div>
+          <div class="ex-category">KinÃ© : Lubrification Rotule & StabilitÃ©</div>
+          <div class="ex-title">Squats KinÃ© + Step UnilatÃ©ral</div>
+        </div>
+        <div class="ex-load-badge">
+          <div class="weight">16 kg</div>
+          <div class="sets">3 Ã— 8 reps validÃ©</div>
+        </div>
+      </div>
+      <div class="series-breakdown">
+        <div class="series-title">SÃ©ries validÃ©es le 13/10 :</div>
+        <div class="series-grid">
+          <div class="serie-pill">Chauffe PDC : <span>0 kg</span> Ã— 20</div>
+          <div class="serie-pill">Chauffe HaltÃ¨re : <span>12 kg</span> Ã— 20</div>
+          <div class="serie-pill">Step S1 : <span>16 kg</span> Ã— 8</div>
+          <div class="serie-pill">Step S2 : <span>16 kg</span> Ã— 8</div>
+          <div class="serie-pill">Step S3 : <span>16 kg</span> Ã— 8</div>
+        </div>
+      </div>
+      <div class="overload-box">
+        <div class="otitle"><span>Verrouillage Palier</span> <span>Cible : 16 kg propre</span></div>
+        <div style="font-size: 0.74rem; color: #c9d1d9;">Salle Ã©quipÃ©e en 16 kg puis 20 kg. On consolide 16 kg x 8 sur 2 sÃ©ances avant d'attaquer les 20 kg.</div>
+      </div>
+    </div>
+
+    <!-- Moteur nÂ°1 : Presse -->
+    <div class="exercise-card" style="border-color: var(--green);">
+      <div class="ex-header">
+        <div>
+          <div class="ex-category">Moteur nÂ°1 : Force Quads + Grand Fessier</div>
+          <div class="ex-title">Presse Horizontale (Matrix Aix - SiÃ¨ge Cran 7)</div>
+        </div>
+        <div class="ex-load-badge">
+          <div class="weight" style="color: var(--green);">134 kg Ã— 7</div>
+          <div class="sets">RECORD DU 13/10</div>
+        </div>
+      </div>
+      <div class="series-breakdown">
+        <div class="series-title">Performance validÃ©e aujourd'hui :</div>
+        <div class="series-grid">
+          <div class="serie-pill">Chauffe : <span>81,3 kg</span> Ã— 8</div>
+          <div class="serie-pill">Chauffe : <span>103,4 kg</span> Ã— 5</div>
+          <div class="serie-pill">S1 : <span>127 kg</span> Ã— 8</div>
+          <div class="serie-pill">S2 : <span>130 kg</span> Ã— 8</div>
+          <div class="serie-pill">S3 : <span>130 kg</span> Ã— 8</div>
+          <div class="serie-pill" style="border-color: var(--green); background: var(--green-dim); font-weight: 800;">S4 : <span>134 kg</span> Ã— 7 ðŸ†</div>
+        </div>
+      </div>
+      <div class="overload-box">
+        <div class="otitle"><span>Consigne d'or validÃ©e</span> <span>Pieds tiers supÃ©rieur</span></div>
+        <div style="font-size: 0.74rem; color: #c9d1d9;">Pieds hauts, poussÃ©e 100% talons. Quads + grand fessier activÃ©s sans cisaillement rotulien. Prochaine Ã©tape : verrouiller 134 kg x 8 complet.</div>
+      </div>
+      <div class="overload-box" style="margin-top: 6px;">
+        <div class="otitle"><span>Rampe de Surcharge Presse</span> <span>Nouvelle cible : 138-140 kg</span></div>
+        <div class="ramp-steps">
+          <div class="ramp-step current"><div class="slabel">S1 (13 oct)</div><div class="sval">134 kg Ã— 7 âœ…</div></div>
+          <div class="ramp-step"><div class="slabel">S2 (20 oct)</div><div class="sval">134 kg (3x8)</div></div>
+          <div class="ramp-step"><div class="slabel">S3 (27 oct)</div><div class="sval">138 kg (test)</div></div>
+          <div class="ramp-step target"><div class="slabel">S4 (3 nov)</div><div class="sval">140 kg Ã— 8</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Ischios -->
+    <div class="exercise-card">
+      <div class="ex-header">
+        <div>
+          <div class="ex-category">Ischios : Protection Rotule & ChaÃ®ne PostÃ©rieure</div>
+          <div class="ex-title">Leg Curl Assis Machine</div>
+        </div>
+        <div class="ex-load-badge">
+          <div class="weight">54,3 kg</div>
+          <div class="sets">3 Ã— 8 reps validÃ©</div>
+        </div>
+      </div>
+      <div class="series-breakdown">
+        <div class="series-title">DÃ©tail des 3 sÃ©ries validÃ©es :</div>
+        <div class="series-grid">
+          <div class="serie-pill">S1 : <span>52 kg</span> Ã— 8</div>
+          <div class="serie-pill">S2 : <span>52 kg</span> Ã— 8</div>
+          <div class="serie-pill" style="border-color: var(--green);">S3 : <span>54,3 kg</span> Ã— 8</div>
+        </div>
+      </div>
+      <div class="overload-box">
+        <div class="otitle"><span>Tempo contrÃ´lÃ©</span> <span>2s excentrique</span></div>
+        <div style="font-size: 0.74rem; color: #c9d1d9;">Plage haute 54,3 kg atteinte. Ã‰quilibre parfait du ratio ischio/quadriceps.</div>
+      </div>
+    </div>
+
+    <!-- Bonus Ã‰paules -->
+    <div class="exercise-card">
+      <div class="ex-header">
+        <div>
+          <div class="ex-category">Bonus : DeltoÃ¯des LatÃ©raux (Armure Volley)</div>
+          <div class="ex-title">Ã‰lÃ©vations LatÃ©rales HaltÃ¨res</div>
+        </div>
+        <div class="ex-load-badge">
+          <div class="weight">7 kg</div>
+          <div class="sets">3 sÃ©ries pump</div>
+        </div>
+      </div>
+      <div class="series-breakdown">
+        <div class="series-title">SÃ©ries validÃ©es le 13/10 :</div>
+        <div class="series-grid">
+          <div class="serie-pill">S1 : <span>7 kg</span> Ã— 16</div>
+          <div class="serie-pill">S2 : <span>7 kg</span> Ã— 16</div>
+          <div class="serie-pill">S3 : <span>7 kg</span> Ã— 17</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TAB: UPPER 1 -->
+  <section id="upper1" class="content-section">
+    <div class="alert-box">
+      <strong>Jeudi midi (Aix) :</strong> Attention ce jeudi 15 oct = JOUR DE MATCH CONTRE LA D3 Ã€ 20H ! Charges modulÃ©es Ã  RPE 7-8, zÃ©ro Ã©chec pour garder le bras vif.
+    </div>
+
+    <div class="exercise-card">
+      <div class="ex-header">
+        <div>
+          <div class="ex-category">Dos 1</div>
+          <div class="ex-title">Tirage Poitrine Prise Large</div>
+        </div>
+        <div class="ex-load-badge">
+          <div class="weight">66-73 kg</div>
+          <div class="sets">3 Ã— 8 reps</div>
+        </div>
+      </div>
+      <div class="series-breakdown">
+        <div class="series-title">DÃ©tail des 3 sÃ©ries :</div>
+        <div class="series-grid">
+          <div class="serie-pill">S1 : <span>52 kg</span> Ã— 10</div>
+          <div class="serie-pill">S2 : <span>66 kg</span> Ã— 8</div>
+          <div class="serie-pill">S3 : <span>73 kg</span> Ã— 8</div>
+        </div>
+      </div>
+      <div class="overload-box">
+        <div class="otitle"><span>Surcharge Hors-Match</span> <span>Cible : 73 kg (3x8)</span></div>
+        <div style="font-size: 0.74rem; color: #c9d1d9;">En semaine 2 et 3 : valider 73 kg sur les 3 sÃ©ries effectives complÃ¨tes.</div>
+      </div>
+    </div>
+
+    <div class="exercise-card">
+      <div class="ex-header">
+        <div>
+          <div class="ex-category">Dos 2 (0 lombaire)</div>
+          <div class="ex-title">Machine Seated Row</div>
+        </div>
+        <div class="ex-load-badge">
+          <div class="weight">45-50 kg</div>
+          <div class="sets">3 Ã— 8 reps</div>
+        </div>
+      </div>
+      <div class="series-breakdown">
+        <div class="series-title">DÃ©tail des 3 sÃ©ries :</div>
+        <div class="series-grid">
+          <div class="serie-pill">S1 : <span>45 kg</span> Ã— 8</div>
+          <div class="serie-pill">S2 : <span>45 kg</span> Ã— 8</div>
+          <div class="serie-pill">S3 : <span>50 kg</span> Ã— 8</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="exercise-card">
+      <div class="ex-header">
+        <div>
+          <div class="ex-category">Pecs 1 (Bandes poignets)</div>
+          <div class="ex-title">DÃ©veloppÃ© CouchÃ© InclinÃ© Smith</div>
+        </div>
+        <div class="ex-load-badge">
+          <div class="weight">46 kg</div>
+          <div class="sets">3 Ã— 8 reps</div>
+        </div>
+      </div>
+      <div class="series-breakdown">
+        <div class="series-title">DÃ©tail Jeudi 15 oct (Match D3) :</div>
+        <div class="series-grid">
+          <div class="serie-pill">S1 : <span>36 kg</span> Ã— 10</div>
+          <div class="serie-pill">S2 : <span>41 kg</span> Ã— 8</div>
+          <div class="serie-pill">S3 : <span>46 kg</span> Ã— 8</div>
+        </div>
+      </div>
+      <div class="overload-box">
+        <div class="otitle"><span>Rampe de Surcharge Smith</span> <span>Cible : 51 kg</span></div>
+        <div class="ramp-steps">
+          <div class="ramp-step current"><div class="slabel">S1 (Match)</div><div class="sval">46 kg max</div></div>
+          <div class="ramp-step"><div class="slabel">S2 (22 oct)</div><div class="sval">51 kg (test)</div></div>
+          <div class="ramp-step"><div class="slabel">S3 (29 oct)</div><div class="sval">51 kg Ã— 8</div></div>
+          <div class="ramp-step target"><div class="slabel">S4 (Tokyo)</div><div class="sval">51 kg (3x8)</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="exercise-card">
+      <div class="ex-header">
+        <div>
+          <div class="ex-category">Pecs 2</div>
+          <div class="ex-title">Pec Deck / Butterfly</div>
+        </div>
+        <div class="ex-load-badge">
+          <div class="weight">73-80 kg</div>
+          <div class="sets">3 Ã— 8 reps</div>
+        </div>
+      </div>
+      <div class="series-breakdown">
+        <div class="series-title">DÃ©tail des 3 sÃ©ries :</div>
+        <div class="series-grid">
+          <div class="serie-pill">S1-2 : <span>73 kg</span> Ã— 8</div>
+          <div class="serie-pill">S3 : <span>80 kg</span> Ã— 8</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="exercise-card">
+      <div class="ex-header">
+        <div>
+          <div class="ex-category">Ã‰paules</div>
+          <div class="ex-title">Face-Pulls + Ã‰lÃ©vations LatÃ©rales</div>
+        </div>
+        <div class="ex-load-badge">
+          <div class="weight">24 kg / 8 kg</div>
+          <div class="sets">3 Ã— 10-12 reps</div>
+        </div>
+      </div>
+      <ul class="ex-details">
+        <li>Face-pulls poulie : 3 Ã— 10 Ã  <strong>24-27 kg</strong></li>
+        <li>Ã‰lÃ©vations latÃ©rales haltÃ¨res : 3 Ã— 12 Ã  <strong>8 kg</strong></li>
+      </ul>
+    </div>
+
+    <div class="exercise-card">
+      <span class="superset-tag">SUPERSET BRAS POULIE</span>
+      <div class="ex-title">Triceps Corde + Curl Marteau Corde</div>
+      <ul class="ex-details">
+        <li>Extension triceps corde : 3 Ã— 8 Ã  <strong>18-20 kg</strong></li>
+        <li>Curl marteau corde : 3 Ã— 8 Ã  <strong>18-20 kg</strong></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- TAB: LOWER 2 -->
+  <section id="lower2" class="content-section active">
+    <div class="alert-box">
+      <strong>Vendredi midi (Marseille) :</strong> ZÃ‰RO PLYOMÃ‰TRIE. SÃ©ance chill sur les quads, mais on pousse la surcharge progressive sur la machine Ã  Hip Thrust pour battre le record !
+    </div>
+
+    <div class="exercise-card">
+      <div class="ex-header">
+        <div>
+          <div class="ex-category">KinÃ© â€” ContrÃ´le Lent</div>
+          <div class="ex-title">Step UnilatÃ©ral KinÃ©</div>
+        </div>
+        <div class="ex-load-badge">
+          <div class="weight">14 kg</div>
+          <div class="sets">3 Ã— 6-8 reps / jambe</div>
+        </div>
+      </div>
+      <div class="overload-box">
+        <div class="otitle"><span>Tempo Lent 3 sec</span></div>
+        <div style="font-size: 0.74rem; color: #c9d1d9;">Appui talon strict, 0 choc. Renforce le tendon sans crÃ©er de courbatures de quadriceps pour le samedi.</div>
+      </div>
+    </div>
+
+    <div class="exercise-card">
+      <div class="ex-header">
+        <div>
+          <div class="ex-category">Moteur DÃ©tente â€” Record Ã  battre</div>
+          <div class="ex-title">Machine Ã  Hip Thrust</div>
+        </div>
+        <div class="ex-load-badge">
+          <div class="weight">60-65 kg</div>
+          <div class="sets">3 Ã— 8 reps</div>
+        </div>
+      </div>
+      <div class="series-breakdown">
+        <div class="series-title">DÃ©tail Vendredi 16 oct :</div>
+        <div class="series-grid">
+          <div class="serie-pill">S1 : <span>60 kg</span> Ã— 8</div>
+          <div class="serie-pill">S2 : <span>62,7 kg</span> Ã— 8</div>
+          <div class="serie-pill">S3 : <span>65 kg</span> Ã— 8</div>
+        </div>
+      </div>
+      <div class="overload-box">
+        <div class="otitle"><span>Rampe de Surcharge Hip Thrust</span> <span>Cible : 72,7-75 kg</span></div>
+        <div class="ramp-steps">
+          <div class="ramp-step current"><div class="slabel">S1 (16 oct)</div><div class="sval">65 kg Ã— 8</div></div>
+          <div class="ramp-step"><div class="slabel">S2 (23 oct)</div><div class="sval">67,5 kg Ã— 8</div></div>
+          <div class="ramp-step"><div class="slabel">S3 (30 oct)</div><div class="sval">70-72,7 kg</div></div>
+          <div class="ramp-step target"><div class="slabel">S4 (Tokyo)</div><div class="sval">75 kg RECORD</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="exercise-card">
+      <div class="ex-header">
+        <div>
+          <div class="ex-category">Ressort Cheville</div>
+          <div class="ex-title">Presse Mollets Machine</div>
+        </div>
+        <div class="ex-load-badge">
+          <div class="weight">90-100 kg</div>
+          <div class="sets">3 Ã— 10-12 reps</div>
+        </div>
+      </div>
+      <div class="series-breakdown">
+        <div class="series-title">DÃ©tail des 3 sÃ©ries :</div>
+        <div class="series-grid">
+          <div class="serie-pill">S1 : <span>90 kg</span> Ã— 12</div>
+          <div class="serie-pill">S2 : <span>95 kg</span> Ã— 10</div>
+          <div class="serie-pill">S3 : <span>100 kg</span> Ã— 10</div>
+        </div>
+      </div>
+      <div class="overload-box">
+        <div class="otitle"><span>Surcharge Mollets</span> <span>Cible : 110 kg</span></div>
+        <div style="font-size: 0.74rem; color: #c9d1d9;">Valider 100 kg x 12 sur les 3 sÃ©ries en S2/S3 avant de monter Ã  110 kg.</div>
+      </div>
+    </div>
+    <!-- FINISHER KINÉ POIGNET GAUCHE -->
+    <div class="exercise-card" style="border-color: #38bdf8; background: rgba(56, 189, 248, 0.06); box-shadow: 0 0 12px rgba(56, 189, 248, 0.15);">
+      <div class="ex-header">
+        <div>
+          <div class="ex-category" style="color: #38bdf8; font-weight: 800;">FINISHER KINÉ • POIGNET GAUCHE (EXTENSEURS)</div>
+          <div class="ex-title">Extension Poignet Haltère au Banc (Reverse Wrist Curl)</div>
+        </div>
+        <div class="ex-load-badge" style="border-color: #38bdf8;">
+          <div class="weight" style="color: #38bdf8;">1 à 2 kg</div>
+          <div class="sets">Fin de séance • 4 min</div>
+        </div>
+      </div>
+      <div class="series-breakdown">
+        <div class="series-title">Protocole Médical en 2 Phases :</div>
+        <div class="series-grid">
+          <div class="serie-pill">Phase 1 : <span>2 × 30-45s ISOMÉTRIE</span> (Poignet levé à 15°)</div>
+          <div class="serie-pill">Repos : <span>1 min</span></div>
+          <div class="serie-pill">Phase 2 : <span>2 × 6-8 EXCENTRIQUE</span> (Descente lente 3s)</div>
+          <div class="serie-pill">Remontée : <span style="color: #f59e0b; font-weight: 800;">100% MAIN DROITE</span></div>
+        </div>
+      </div>
+      <div class="overload-box">
+        <div class="otitle"><span>Consignes d'exécution au banc plat</span> <span>Poignet Gauche</span></div>
+        <div style="font-size: 0.76rem; color: #c9d1d9; line-height: 1.45;">
+          • <strong>Position :</strong> Assis, avant-bras gauche scellé à plat sur le banc (ou cuisse), <strong>paume vers le bas (pronation)</strong>, le poignet dépasse dans le vide.<br>
+          • <strong>Phase 1 (Isométrie pure) :</strong> Attrape l'haltère de 1-2 kg. Relève la main de 15° vers le haut. <strong>Bloque sans bouger pendant 30 à 45s</strong> (2 séries, 1 min repos). Si 0 douleur, passe à la phase 2.<br>
+          • <strong>Phase 2 (Excentrique assisté) :</strong> Depuis la position haute, freine la descente sur 3 secondes. En bas, <strong>pose ta main droite sous l'haltère pour le remonter</strong>. Ton poignet gauche ne force jamais à la remontée !
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TAB: CALENDRIER -->
+  <section id="cal" class="content-section">
+    <div class="cal-item">
+      <div class="cal-date">Lundi 12 Octobre (20h)</div>
+      <div class="cal-title">Volley EntraÃ®nement : Test Mire 3m23</div>
+      <div class="cal-desc">2-3 sauts avec Ã©lan le long de la mire pour noter le reach d'octobre. Gammes attaque : viseur main droite + consigne passeur balles hautes.</div>
+    </div>
+
+    <div class="cal-item" style="border-color: var(--primary); background: rgba(56, 189, 248, 0.06);">
+      <div class="cal-date" style="color: var(--primary);">Mardi 13 Octobre (Midi) â€” AUJOURD'HUI âš¡</div>
+      <div class="cal-title">LOWER 1 (Aix) : Presse 3 x 8 Ã  127 kg</div>
+      <div class="cal-desc">PoussÃ©e 100% talons (tiers supÃ©rieur) pour engager les fessiers. PliomÃ©trie sur box au repos par prÃ©caution avant-pied.</div>
+    </div>
+
+    <div class="cal-item">
+      <div class="cal-date">Jeudi 15 Octobre (20h)</div>
+      <div class="cal-title">LE MATCH CONTRE LA D3 ðŸ”¥</div>
+      <div class="cal-desc">Mode tueur Ã  100%. Garder le recul (balle devant), utiliser le block-out, 0 prise de tÃªte technique.</div>
+    </div>
+
+    <div class="cal-item">
+      <div class="cal-date">Semaine 2 (18 au 24 Octobre)</div>
+      <div class="cal-title">Surcharge : Presse 130 kg (test) & Hip Thrust 67,5 kg</div>
+      <div class="cal-desc">Tentative de passage des 130 kg x 8 sur la 3e sÃ©rie de presse mardi. MontÃ©e Ã  67,5 kg sur le Hip Thrust vendredi.</div>
+    </div>
+
+    <div class="cal-item">
+      <div class="cal-date">Semaine 3 (25 au 31 Octobre)</div>
+      <div class="cal-title">Pic de Force : 130 kg validÃ©s & Hip Thrust 70-72,7 kg</div>
+      <div class="cal-desc">Step kinÃ© Ã  20 kg. Hip Thrust machine qui Ã©gale l'ancien record de juin (72,7 kg).</div>
+    </div>
+
+    <div class="cal-item">
+      <div class="cal-date">Semaine 4 (1 au 7 Novembre)</div>
+      <div class="cal-title">Nouveau Record & Rotation Thomas</div>
+      <div class="cal-desc">Thomas tourne en doublon au volley. Vendredi 6 nov : nouveau record Hip Thrust Ã  75 kg x 8 !</div>
+    </div>
+
+    <div class="cal-item" style="border-color: var(--primary);">
+      <div class="cal-date" style="color: var(--accent);">Dimanche 8 Novembre 2026 âœˆï¸</div>
+      <div class="cal-title">DÃ‰PART POUR TOKYO !</div>
+      <div class="cal-desc">Achat des ASICS Metarise 2 (~81 â‚¬). Deload tendineux, 20k pas/jour. Bilan retour 1er dÃ©cembre avec 85 cm de dÃ©tente !</div>
+    </div>
+  </section>
+
+  <!-- TAB: Ã‰CHAUFFEMENT VOLLEY -->
+  <section id="warmup" class="content-section">
+    <div class="alert-box" style="background: rgba(245, 158, 11, 0.15); border-color: #f59e0b; color: #fde68a;">
+      <strong>ðŸ”¥ Routine Officielle Volley (16 min) :</strong> Ã€ exÃ©cuter avant chaque entraÃ®nement / match. ProtÃ¨ge la rotule gauche, active l'Ã©lasticitÃ© et potentie la dÃ©tente (PAP).
+    </div>
+
+    <!-- BLOC 1 -->
+    <div class="exercise-card">
+      <div class="ex-header">
+        <div>
+          <div class="ex-category">19h45 - 19h50 â€¢ Contre le mur</div>
+          <div class="ex-title">1. AnalgÃ©sie Tendineuse Rotule Gauche</div>
+        </div>
+      </div>
+      <div class="series-breakdown">
+        <div class="series-title">IsomÃ©trie Lourde (Jill Cook)</div>
+        <div class="series-grid">
+          <div class="serie-pill">Chaise murale 90Â° : <span>2 x 45 sec</span></div>
+          <div class="serie-pill">Repos : <span>30 sec</span></div>
+          <div class="serie-pill">Squats lents PDC : <span>15 reps</span></div>
+        </div>
+      </div>
+      <div class="overload-box">
+        <div class="otitle">Consigne BiomÃ©canique</div>
+        <p style="color: var(--text-muted); font-size: 0.78rem;">Dos Ã  plat, cuisses Ã  90Â°, pousser dans les talons. AnesthÃ©sie la rotule gauche pendant 45 min sans fatigue. Mobiliser les poignets en 8 pendant la chaise.</p>
+      </div>
+    </div>
+
+    <!-- BLOC 2 -->
+    <div class="exercise-card">
+      <div class="ex-header">
+        <div>
+          <div class="ex-category">19h50 - 19h55 â€¢ Bord de terrain</div>
+          <div class="ex-title">2. MobilitÃ© SpÃ©cifique & Chevilles</div>
+        </div>
+      </div>
+      <div class="series-breakdown">
+        <div class="series-title">Exercices de DÃ©verrouillage</div>
+        <div class="series-grid">
+          <div class="serie-pill">Knee-to-Wall : <span>10 reps / jambe</span></div>
+          <div class="serie-pill">Leg Swings : <span>10 av/arr + 10 lat</span></div>
+          <div class="serie-pill">Fentes marchÃ©es : <span>5 / jambe + rotation</span></div>
+        </div>
+      </div>
+      <div class="overload-box">
+        <div class="otitle">Point ClÃ© Knee-to-Wall</div>
+        <p style="color: var(--text-muted); font-size: 0.78rem;">Pied Ã  8-10 cm du mur, genou touche le mur en gardant le <strong>talon 100% collÃ© au sol</strong>. Indispensable pour la violence du bloc-step droit.</p>
+      </div>
+    </div>
+
+    <!-- BLOC 3 -->
+    <div class="exercise-card">
+      <div class="ex-header">
+        <div>
+          <div class="ex-category">19h55 - 20h00 â€¢ Rassemblement terrain</div>
+          <div class="ex-title">3. RÃ©activitÃ© Ã‰lastique (Stiffness)</div>
+        </div>
+      </div>
+      <div class="series-breakdown">
+        <div class="series-title">Plantar & Achille Stiffness</div>
+        <div class="series-grid">
+          <div class="serie-pill">Pogo Jumps : <span>2 x 10 rebonds courts</span></div>
+        </div>
+      </div>
+      <div class="overload-box">
+        <div class="otitle">Consigne</div>
+        <p style="color: var(--text-muted); font-size: 0.78rem;">Genoux quasi tendus, rebonds secs et ultra-rapides sur l'avant-pied (temps de contact au sol minimum, comme sur des braises).</p>
+      </div>
+    </div>
+
+    <!-- BLOC 4 -->
+    <div class="exercise-card">
+      <div class="ex-header">
+        <div>
+          <div class="ex-category">20h05 - 20h15 â€¢ MontÃ©e en puissance</div>
+          <div class="ex-title">4. Potentiation Nerveuse (PAP)</div>
+        </div>
+      </div>
+      <div class="series-breakdown">
+        <div class="series-title">Ã‰lans progressifs & Pause PAP</div>
+        <div class="series-grid">
+          <div class="serie-pill">Ã‰lan 50% : <span>2 reps</span></div>
+          <div class="serie-pill">Ã‰lan 80% : <span>1 rep</span></div>
+          <div class="serie-pill">Ã‰lan 95% : <span>1 rep</span></div>
+          <div class="serie-pill" style="border-color: var(--accent); background: var(--accent-dim);"><span style="color: var(--accent);">PAUSE CHRONO : 2 MIN</span></div>
+        </div>
+      </div>
+      <div class="overload-box">
+        <div class="otitle">RÃ¨gle de Fer</div>
+        <p style="color: var(--text-muted); font-size: 0.78rem;">La pause de 2 minutes dissipe la fatigue et libÃ¨re le pic nerveux des fibres Type IIx. Frotter la semelle droite (anti-dÃ©rapage).</p>
+      </div>
+    </div>
+
+    <!-- BLOC 5 -->
+    <div class="exercise-card">
+      <div class="ex-header">
+        <div>
+          <div class="ex-category">20h15 - 20h20 â€¢ Au Filet</div>
+          <div class="ex-title">5. Test Officiel DÃ©tente Ã  la Mire</div>
+        </div>
+      </div>
+      <div class="series-breakdown">
+        <div class="series-title">Mire Ã  3m23 (8 bandes de 10 cm)</div>
+        <div class="series-grid">
+          <div class="serie-pill">2 Sauts Max : <span>FilmÃ© Slow-Mo</span></div>
+          <div class="serie-pill">Repos : <span>60 sec</span></div>
+        </div>
+      </div>
+      <div class="overload-box">
+        <div class="otitle">Protocole VidÃ©o</div>
+        <p style="color: var(--text-muted); font-size: 0.78rem;">Filmer de 3/4 face Ã  la mire au ralenti. Ã‰lan complet de gaucher. On comptera les bandes dÃ©passÃ©es ce soir sur l'arrÃªt sur image.</p>
+      </div>
+    </div>
+
+    <!-- BLOC 6 -->
+    <div class="exercise-card">
+      <div class="ex-header">
+        <div>
+          <div class="ex-category">Ballons Ã  deux â€¢ 3 min</div>
+          <div class="ex-title">6. Armure Haut du Corps & Viseur</div>
+        </div>
+      </div>
+      <div class="series-breakdown">
+        <div class="series-title">Coiffe des rotateurs & ChaÃ®ne oblique</div>
+        <div class="series-grid">
+          <div class="serie-pill">Poignets en 8 : <span>20 sec</span></div>
+          <div class="serie-pill">Rotations externes : <span>15 reps</span></div>
+          <div class="serie-pill">Scarecrow : <span>10 reps</span></div>
+          <div class="serie-pill">Y-T-W : <span>5 reps chq</span></div>
+          <div class="serie-pill" style="border-color: var(--primary);">Viseur ralenti : <span>5 frappes Ã  blanc</span></div>
+        </div>
+      </div>
+      <div class="overload-box">
+        <div class="otitle">Le Viseur (ClÃ© du smash)</div>
+        <p style="color: var(--text-muted); font-size: 0.78rem;">Main droite tendue qui vise la balle Ã  11h-12h. Buste de profil en l'air, arc bandÃ© coude gauche, arrachÃ© coude droit aux cÃ´tes -> fouettÃ© relÃ¢chÃ© !</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="footer-bar">
+    Master Plan Mathias Hamel â€¢ Synchro Mobile
+  </div>
+
+  <script>
+    function showTab(tabId) {
+      document.querySelectorAll('.content-section').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+      const targetSec = document.getElementById(tabId);
+      if(targetSec) targetSec.classList.add('active');
+      const targetBtn = document.querySelector(`.tab-btn[data-tab="${tabId}"]`);
+      if(targetBtn) {
+        targetBtn.classList.add('active');
+      } else {
+        const tabMap = { 'lower1': 0, 'warmup': 1, 'upper1': 2, 'lower2': 3, 'upper2': 4, 'cal': 5 };
+        const btns = document.querySelectorAll('.tab-btn');
+        if(tabMap[tabId] !== undefined && btns[tabMap[tabId]]) btns[tabMap[tabId]].classList.add('active');
+      }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  </script>
+</body>
+</html>
